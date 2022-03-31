@@ -1,0 +1,24 @@
+[
+    
+    {
+        "id":1,
+        "title":"Guitarra Stratocaster Fender",
+        "price":122000,
+        "thumbnail":"./imagenes/STRATOCASTER.jpg"
+    },
+
+    {
+        "id":2,
+        "title":"Guitarra Les Paul Gibson",
+        "price":255000,
+        "thumbnail":"./imagenes/LES PAUL.jpg"
+    },
+
+    {
+        "id":3,
+        "title":"Guitarra SG Gibson",
+        "price":190000,
+        "thumbnail":"./imagenes/SG.jpg"
+    }
+
+]
