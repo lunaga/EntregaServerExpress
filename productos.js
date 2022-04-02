@@ -1,68 +1,89 @@
-const fs = require ('fs')
-
+const {promises: fs} = require('fs');
 
 class Contenedor{
     constructor(archivo){
         this.archivo = archivo;
     }
 
-
-
-    async save(objeto){
-        try {
-            for(let i=0; i< objeto.length;i++){
-                objeto[i].id= 1+ i
-            }
-            console.table(objeto)
-            await fs.promises.writeFile(this.archivo,JSON.stringify(objeto))
-        } catch (error) {
-            throw new Error(error,'Error no se puede guardar el producto')
+    async save(obj){
+        const objs = await this.getAll()
+        let newId 
+        if (objs.length == 0){
+            newId = 1
+        } else{
+            newId = objs[objs.length - 1].id +1
+        }
+        const newObj = {...obj, id: newId}
+        objs.push(newObj)
+        try{
+            await fs.writeFile(this.archivo,JSON.stringify(objs,null,4));
+            return newId;
+        } catch(err){
+            console.log('Error',err)
         }
     }
-
 
     async getById(id){
-        try{
-            const contenido = await this.getAll()
-            let idencontrado = contenido.find(prod => prod.id === id)
-            console.table(idencontrado)
-        }catch(error){
-            throw new Error(error,"Error no se encuentra dicho producto")
-        }
+        const objs = await this.getAll()
+        const buscarId= objs.find(obs => obs.id == id)
+        return buscarId
     }
-
 
     async getAll(){
         try{
-            let contenido = await fs.promises.readFile(this.archivo, "utf8");
-            return JSON.parse(contenido)
-        } catch(error){
-            throw new Error(error,"Error al leer el archivo")
+            const objs = await fs.readFile(this.archivo,'utf-8')
+            return JSON.parse(objs)
+        }
+        catch(err){
+            return "Error, no se encuentran los prod"
         }
     }
-
 
     async deleteById(id){
-        try{
-            const contenido = await this.getAll()
-            const deleted = contenido.filter(producto => producto.id !== id)
-            await fs.promises.writeFile(this.archivo, JSON.stringify(deleted,null,4))
-            console.log('Elemento eliminado')
-            console.table(deleted)
-        }catch(error){
-            throw new Error(error,"Error al borrar el producto")
+        try {
+            const cont = await fs.readFile(this.archivo, 'utf-8');
+
+            if (cont === "") {
+                return "Empty list";
+            } else {
+                const products = JSON.parse(cont);
+                const newProducts = products.filter((item) => item.id !== id)
+                await fs.writeFile(this.archivo, JSON.stringify(newProducts));
+            }
+        } catch (err) {
+            console.log('Error',err)
         }
     }
-
+    
 
     async deleteAll(){
         try{
-            await fs.promises.writeFile(this.archivo, []);
-            console.log("Contenido borrado")
-        } catch(error){
-            throw new Error(error,"Error al borrar todo")
+            await fs.promises.writeFile(`./${this.archivo.toString()}.txt`,"")
+            console.log("Se elimino el contenido")
+        }
+        catch(err){
+            console.log('Error',err)
         }
     }
+
+    // async updateProduct(id,productoNuevo){
+    //     try{
+    //         const productos = this.getAll()
+    //         const index = productos.findIndex(prod => prod.id === id)
+    //         if(productoNuevo.name){productos[index].name= productoNuevo.name}
+    //         if(productoNuevo.price){productos[index].price=productoNuevo.price}
+    //         if(productoNuevo.thumbnail){productos[index].thumbnail=productoNuevo.thumbnail}
+    //         return `El producto ${productoNuevo.name} fue actualizado correctamente`
+    //     } catch(error){
+    //         throw new Error(error,"Error al actualizar el producto")
+    //     }
+    // }
+
+    // async modifyById(){
+    //     try{
+    //         await fs.promises.writeFile
+    //     }
+    // }
 }
 
-module.exports = Contenedor;
+module.exports = Contenedor

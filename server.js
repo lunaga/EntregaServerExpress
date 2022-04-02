@@ -15,14 +15,14 @@ app.use('/api/productos',productos)
 app.use('/static', express.static('public'))
 
 //Muestra los productos
-app.get('/', (req, res) => {
+productos.get('/', (req, res) => {
     prods.getAll().then(resp => res.send(resp))
 })
 
 
 //Id por prodcuto
 
-app.get('/:id', (req, res) => {
+productos.get('/:id', (req, res) => {
     prods.getById(req.params.id).then(resp => res.send(resp))
 })
 
@@ -30,31 +30,41 @@ app.get('/:id', (req, res) => {
 
 //Agrega un producto 
 
-app.post('/', (req, res) => {
-    const addedProduct = req.body
-    prods.push(addedProduct)
-    res.send(prods)
+
+productos.post('/', (req, res) => {
+    const nuevoprod = req.body
+    prods.save(nuevoprod)
+    res.send({ Productos: 'Guardados' })
 })
 
 
 
 //Actualiza producto 
 
-app.put('/:id', (req, res) => {  
-})
+// productos.put('/:id', (req, res) => {
+//     const prodmodificado = req.body
+//     prods.modifyById(req.body)
+//     res.send({ obj: 'Producto modificado!' })
+// })
 
-
+// productos.put('/:id',(req, res)=>{
+//     const {id} = req.params
+//     let productoNuevo = req.body
+//     let resp = producto.updateProduct(parseInt(id),productoNuevo)
+//     res.json(resp)
+// })
 
 //Elimina segun su id
 
 
-app.delete('/:id', (req, res) => {
+productos.delete('/:id', (req, res) => {
     prods.getById(req.params.id).then(resp => res.send(`Se elimino el producto id: ${req.params.id}`))
     
 })
 
 
-
 app.listen(port,()=>{
     console.log(`Servidor escuchando en el puerto ${port}`);
 })
+
+
