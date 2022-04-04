@@ -1,37 +1,61 @@
 <!-- <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productos</title>
 </head>
+
 <body>
-    <form action="http://localhost:8080/api/productos" method="POST" >
-        title: <input type="text" name="title">
-        price: <input type="number" name="price">
-        thumbnail: <input type="text" name="thumbnail">
-        <button>Enviar</button>
-    </form>
+    <div class="d-flex flex-column align-items-center">
+        <h2>Lista de productos</h2>
+        <button class="w-25 m-2" onclick="ingresar()">Ingresar nuevo producto</button>
+        <button class="w-25 m-2" onclick="modificar()">Modificar prodcuto</button>
+
+        <div id="inputs">
+            <form class="d-flex flex-column m-4" action="/api/productos/:id" method="post">
+                <input type="text" placeholder="title" name="title" required>
+                <input type="number" placeholder="price" name="price" required>
+                <input type="url" placeholder="thumbail" name="thumbail">
+                <button type="submit" class="m-3">Enviar</button>
+            </form>
+        </div>
+    </div>
+    <script src="index.js"></script>
 </body>
+
 </html> -->
 
+<!-- // ---------------------------------------------------------------- -->
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario para ingreso de productos</title>
+    <title>Document</title>
 </head>
+
 <body>
-    <h1>ingrese un producto</h1>
-    <form action="localhost:8080/api/productos" method="POST">
-        title: <input type="text" name="title">
-        price: <input type="number" name="price">
-        thumbnail: <input type="text" name="thumbnail">
-        <button>Enviar</button>
-    </form>
+    <div class="d-flex flex-column align-items-center">
+        <h2>Que deseas hacer?</h2>
+        <button class="w-25 m-2" onclick="ingresar()">Ingresar producto nuevo</button>
+        <button class="w-25 m-2" onclick="modificar()">Modificar producto existente</button>
+
+        <div id="inputs">
+            <form class="d-flex flex-column m-4" action="/api/productos" method="post">
+                <input type="text" placeholder="title" name="title" required>
+                <input type="number" placeholder="price" name="price" required>
+                <input type="url" placeholder="thumbail" name="thumbail">
+                <button type="submit" class="m-3">Agregar</button>
+            </form>
+        </div>
+    </div>
+    <script src="index.js"></script>
 </body>
+
 </html>

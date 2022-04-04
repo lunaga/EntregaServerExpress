@@ -1,89 +1,126 @@
-const {promises: fs} = require('fs');
+const fs = require('fs')
+const { title } = require('process')
 
-class Contenedor{
-    constructor(archivo){
-        this.archivo = archivo;
-    }
+module.exports = class Contenedor {
 
-    async save(obj){
-        const objs = await this.getAll()
-        let newId 
-        if (objs.length == 0){
-            newId = 1
-        } else{
-            newId = objs[objs.length - 1].id +1
-        }
-        const newObj = {...obj, id: newId}
-        objs.push(newObj)
-        try{
-            await fs.writeFile(this.archivo,JSON.stringify(objs,null,4));
-            return newId;
-        } catch(err){
-            console.log('Error',err)
-        }
-    }
+    static id = 0 
 
-    async getById(id){
-        const objs = await this.getAll()
-        const buscarId= objs.find(obs => obs.id == id)
-        return buscarId
-    }
+    constructor(archivo) {
 
-    async getAll(){
-        try{
-            const objs = await fs.readFile(this.archivo,'utf-8')
-            return JSON.parse(objs)
-        }
-        catch(err){
-            return "Error, no se encuentran los prod"
-        }
-    }
+        this.save = function (object) {
+            try {
 
-    async deleteById(id){
-        try {
-            const cont = await fs.readFile(this.archivo, 'utf-8');
+                const tempFile = fs.readFileSync(archivo, 'utf-8')
 
-            if (cont === "") {
-                return "Empty list";
-            } else {
-                const products = JSON.parse(cont);
-                const newProducts = products.filter((item) => item.id !== id)
-                await fs.writeFile(this.archivo, JSON.stringify(newProducts));
+                Contenedor.id++
+                object.price = Number(object.price)
+                let newObject = { ...object, id: Contenedor.id }
+                let newFile = []
+                newFile.push(newObject) 
+
+                if (tempFile === '') { 
+
+                    fs.appendFileSync(archivo, JSON.stringify(newFile, null, 2))
+                }
+                else { 
+
+                    let parseFile = JSON.parse(tempFile) 
+
+                    parseFile.forEach(n => {
+                        if (Contenedor.id <= n.id) {
+                            Contenedor.id = n.id + 1
+                            newFile[0].id = Contenedor.id
+                        }
+                    })
+                    parseFile = [...parseFile, ...newFile] 
+                    fs.writeFileSync(archivo, JSON.stringify(parseFile, null, 2))
+
+                    console.log(parseFile)
+                }
             }
-        } catch (err) {
-            console.log('Error',err)
+            catch (err) {
+                throw new Error('No se pudo guardar')
+            }
+        }
+
+        this.getById = async function (number) {
+            try {
+                const tempFile = await fs.promises.readFile(archivo, 'utf-8')
+
+                let parseFile = JSON.parse(tempFile)
+                let findOut = parseFile.find((n) => n.id === number)
+
+               
+                return (findOut)
+            }
+            catch (err) {
+                throw new Error('No hay resultados')
+            }
+        }
+
+        this.getAll = async function () {
+            try {
+                const tempFile = await fs.promises.readFile(archivo, 'utf-8')
+                let parseFile = JSON.parse(tempFile)
+
+                
+                return parseFile 
+            }
+            catch (err) {
+                throw new Error('No hay resultados')
+            }
+
+        }
+
+        this.deleteById = async function (number) {
+            try {
+                const tempFile = await fs.promises.readFile(archivo, 'utf-8')
+                let parseFile = JSON.parse(tempFile)
+
+                const toDelete = parseFile.findIndex((n) => n.id === number)
+
+                if (toDelete >= 0) {
+                    parseFile.splice(toDelete, 1)
+                    await fs.promises.writeFile(archivo, JSON.stringify(parseFile, null, 2))
+                    console.log('Producto eliminado')
+                } else {
+                    console.log('Id inexistente')
+                }
+
+            }
+            catch (err) {
+                throw new Error('Id no encontrado')
+            }
+        }
+
+        this.deleteAll = async function () {
+            try {
+                await fs.promises.writeFile(archivo, '')
+                console.log('Información del archivo borrada correctamente')
+            }
+            catch (err) {
+                throw new Error('Archivo inexistente')
+            }
+        }
+
+        this.modifyById = async function (values) {
+            try {
+                const tempFile = await fs.promises.readFile(archivo, 'utf-8')
+                values.id = Number(values.id)
+                let parseFile = JSON.parse(tempFile)
+                let found = parseFile.find(n => n.id === values.id)
+                if (found) {
+                    found.title = values.title
+                    found.price = Number(values.price)
+                    found.thumbail = values.thumbail
+                    console.log(parseFile)
+                    fs.writeFileSync(archivo, JSON.stringify(parseFile, null, 2))
+                } else { console.log('no se halló') }
+            }
+            catch (err) {
+                throw new Error('No se pudo guardar')
+            }
         }
     }
-    
-
-    async deleteAll(){
-        try{
-            await fs.promises.writeFile(`./${this.archivo.toString()}.txt`,"")
-            console.log("Se elimino el contenido")
-        }
-        catch(err){
-            console.log('Error',err)
-        }
-    }
-
-    // async updateProduct(id,productoNuevo){
-    //     try{
-    //         const productos = this.getAll()
-    //         const index = productos.findIndex(prod => prod.id === id)
-    //         if(productoNuevo.name){productos[index].name= productoNuevo.name}
-    //         if(productoNuevo.price){productos[index].price=productoNuevo.price}
-    //         if(productoNuevo.thumbnail){productos[index].thumbnail=productoNuevo.thumbnail}
-    //         return `El producto ${productoNuevo.name} fue actualizado correctamente`
-    //     } catch(error){
-    //         throw new Error(error,"Error al actualizar el producto")
-    //     }
-    // }
-
-    // async modifyById(){
-    //     try{
-    //         await fs.promises.writeFile
-    //     }
-    // }
 }
 
-module.exports = Contenedor
